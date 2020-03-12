@@ -1,7 +1,8 @@
 package pl.com.bottega.ecommerce.sales.domain.offer;
 
+import java.math.BigDecimal;
 import java.util.Date;
-
+//:todo Make equals Methods
 public class Product {
   private String productId;
 
@@ -20,6 +21,10 @@ public class Product {
     this.productName = productName;
     this.productSnapshotDate = productSnapshotDate;
     this.productType = productType;
+  }
+
+  public BigDecimal evaluteTotalCostAfterDiscout(BigDecimal discount) {
+    return productPrice.substract(discount);
   }
 
   public String getProductId() {
