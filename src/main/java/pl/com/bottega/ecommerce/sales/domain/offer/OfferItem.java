@@ -17,162 +17,157 @@ import java.util.Objects;
 
 public class OfferItem {
 
-    private Product product;
+  private Product product;
 
-    private int quantity;
+  private int quantity;
+
+  // discount
+  private String discountCause;
+
+  private Money discount;
 
 
-    // discount
-    private String discountCause;
+  public OfferItem(Product product, int quantity,
+      String discountCause,
+      Money discount) {
+    this.product = product;
+    this.quantity = quantity;
+    this.discountCause = discountCause;
+    this.discount = discount;
 
-    private Money discount;
+  }
 
 
-    public OfferItem(Product product, int quantity,
-         String discountCause,
-        Money discount) {
-        this.product = product;
-        this.quantity = quantity;
-        this.discountCause = discountCause;
-        this.discount = discount;
+  public Money evaluateTotalCost() {
 
+    BigDecimal discountValue = new BigDecimal(0);
+    if (discount != null) {
+      discountValue = discountValue.add(discount.getDenomination());
     }
 
+    BigDecimal totalCost = product.getProductPrice().getDenomination()
+        .multiply(new BigDecimal(quantity))
+        .subtract(discountValue);
+    
+    return new Money(product.getProductPrice().getCurrency(),
+        product.getProductPrice().getDenomination());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(discount, discountCause,
+        quantity);
+  }
 
 
-    public Money evaluateTotalCost(){
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    OfferItem offerItem = (OfferItem) o;
+    return quantity == offerItem.quantity &&
+        Objects.equals(product, offerItem.product) &&
+        Objects.equals(discountCause, offerItem.discountCause) &&
+        Objects.equals(discount, offerItem.discount);
+  }
 
-        BigDecimal discountValue = new BigDecimal(0);
-        if (discount != null) {
-            discountValue = discountValue.add(discount.getDenomination());
-        }
-
-        BigDecimal totalCost = product.getProductPrice().getDenomination().multiply(new BigDecimal(quantity))
-            .subtract(discountValue);
-
-        //:todo bad soulution, demeter law
-        return new Money(product.getProductPrice().getCurrency(),product.getProductPrice().getDenomination());
+  /**
+   * @param delta acceptable percentage difference
+   * @return
+   */
+  public boolean sameAs(OfferItem other, double delta) {
+    if (getProductPrice() == null) {
+      if (other.getProductPrice() != null) {
+        return false;
+      }
+    } else if (!getProductPrice().equals(other.getProductPrice())) {
+      return false;
+    }
+    if (product.getProductName() == null) {
+      if (other.getProduct().getProductName() != null) {
+        return false;
+      }
+    } else if (!product.getProductName().equals(other.getProduct().getProductName())) {
+      return false;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(discount, discountCause,
-                quantity);
+    if (getProduct().getProductId() == null) {
+      if (other.getProduct().getProductId() != null) {
+        return false;
+      }
+    } else if (!getProduct().getProductId().equals(other.getProduct().getProductName())) {
+      return false;
+    }
+    if (getProduct().getProductType() == null) {
+      if (other.getProduct().getProductType() != null) {
+        return false;
+      }
+    } else if (!getProduct().getProductType().equals(other.getProduct().getProductType())) {
+      return false;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        OfferItem other = (OfferItem) obj;
-        return Objects.equals(discount, other.discount)
-               && Objects.equals(discountCause, other.discountCause)
-               && quantity == other.quantity
-               && product.equals(other.product)
-               && Objects.equals(evaluateTotalCost(), other.evaluateTotalCost());
+    if (quantity != other.quantity) {
+      return false;
     }
 
-    /**
-     *
-     * @param delta
-     *            acceptable percentage difference
-     * @return
-     */
-    public boolean sameAs(OfferItem other, double delta) {
-        if (getProductPrice() == null) {
-            if (other.getProductPrice() != null) {
-                return false;
-            }
-        } else if (!getProductPrice().equals(other.getProductPrice())) {
-            return false;
-        }
-        if (product.getProductName() == null) {
-            if (other.getProduct().getProductName() != null) {
-                return false;
-            }
-        } else if (!product.getProductName().equals(other.getProduct().getProductName())) {
-            return false;
-        }
-
-        if (getProduct().getProductId() == null) {
-            if (other.getProduct().getProductId() != null) {
-                return false;
-            }
-        } else if (!getProduct().getProductId().equals(other.getProduct().getProductName())) {
-            return false;
-        }
-        if (getProduct().getProductType() == null) {
-            if (other.getProduct().getProductType() != null) {
-                return false;
-            }
-        } else if (!getProduct().getProductType().equals(other.getProduct().getProductType())) {
-            return false;
-        }
-
-        if (quantity != other.quantity) {
-            return false;
-        }
-
-        Money max;
-        Money min;
-        if (evaluateTotalCost().getDenomination().compareTo(other.evaluateTotalCost().getDenomination()) > 0) {
-            max = evaluateTotalCost();
-            min = other.evaluateTotalCost();
-        } else {
-            max = other.evaluateTotalCost();
-            min = evaluateTotalCost();
-        }
-
-        BigDecimal difference = max.getDenomination().subtract(min.getDenomination());
-        BigDecimal acceptableDelta = max.getDenomination().multiply(BigDecimal.valueOf(delta / 100));
-
-        return acceptableDelta.compareTo(difference) > 0;
+    Money max;
+    Money min;
+    if (evaluateTotalCost().getDenomination().compareTo(other.evaluateTotalCost().getDenomination())
+        > 0) {
+      max = evaluateTotalCost();
+      min = other.evaluateTotalCost();
+    } else {
+      max = other.evaluateTotalCost();
+      min = evaluateTotalCost();
     }
 
-    private Money getProductPrice() {
-        product.getProductPrice();
-    }
+    BigDecimal difference = max.getDenomination().subtract(min.getDenomination());
+    BigDecimal acceptableDelta = max.getDenomination().multiply(BigDecimal.valueOf(delta / 100));
 
-    public String getProductId() {
-        return product.getProductId();
-    }
+    return acceptableDelta.compareTo(difference) > 0;
+  }
 
-    public Product getProduct() {
-        return product;
-    }
+  private Money getProductPrice() {
+    return product.getProductPrice();
+  }
 
-    public void setProduct(Product product) {
-        this.product = product;
-    }
+  public String getProductId() {
+    return product.getProductId();
+  }
 
-    public int getQuantity() {
-        return quantity;
-    }
+  public Product getProduct() {
+    return product;
+  }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
+  public void setProduct(Product product) {
+    this.product = product;
+  }
 
-    public String getDiscountCause() {
-        return discountCause;
-    }
+  public int getQuantity() {
+    return quantity;
+  }
 
-    public void setDiscountCause(String discountCause) {
-        this.discountCause = discountCause;
-    }
+  public void setQuantity(int quantity) {
+    this.quantity = quantity;
+  }
 
-    public Money getDiscount() {
-        return discount;
-    }
+  public String getDiscountCause() {
+    return discountCause;
+  }
 
-    public void setDiscount(Money discount) {
-        this.discount = discount;
-    }
+  public void setDiscountCause(String discountCause) {
+    this.discountCause = discountCause;
+  }
+
+  public Money getDiscount() {
+    return discount;
+  }
+
+  public void setDiscount(Money discount) {
+    this.discount = discount;
+  }
 }
