@@ -70,33 +70,8 @@ public class OfferItem {
    * @return
    */
   public boolean sameAs(OfferItem other, double delta) {
-    if (getProductPrice() == null) {
-      if (other.getProductPrice() != null) {
-        return false;
-      }
-    } else if (!getProductPrice().equals(other.getProductPrice())) {
-      return false;
-    }
-    if (product.getProductName() == null) {
-      if (other.getProduct().getProductName() != null) {
-        return false;
-      }
-    } else if (!product.getProductName().equals(other.getProduct().getProductName())) {
-      return false;
-    }
-
-    if (getProduct().getProductId() == null) {
-      if (other.getProduct().getProductId() != null) {
-        return false;
-      }
-    } else if (!getProduct().getProductId().equals(other.getProduct().getProductName())) {
-      return false;
-    }
-    if (getProduct().getProductType() == null) {
-      if (other.getProduct().getProductType() != null) {
-        return false;
-      }
-    } else if (!getProduct().getProductType().equals(other.getProduct().getProductType())) {
+    
+    if(!product.equals(other)){
       return false;
     }
 
