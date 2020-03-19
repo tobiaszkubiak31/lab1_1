@@ -12,11 +12,16 @@ public class Money {
     this.denomination = denomination;
   }
 
-  public BigDecimal substract(BigDecimal value) {
-    return denomination.subtract(value);
-  }
   public String getCurrency() {
     return currency;
+  }
+
+  Money subtract(Money subtrahend){
+    return new Money(currency, denomination.subtract(subtrahend.getDenomination()));
+  }
+
+  Money multiply(int factor){
+    return new Money(currency, denomination.multiply(BigDecimal.valueOf(factor)));
   }
 
   public void setCurrency(String currency) {
@@ -38,8 +43,6 @@ public class Money {
     else {
       return false;
     }
-
-
   }
 
   @Override
@@ -59,4 +62,5 @@ public class Money {
   public int hashCode() {
     return Objects.hash(currency, denomination);
   }
+
 }

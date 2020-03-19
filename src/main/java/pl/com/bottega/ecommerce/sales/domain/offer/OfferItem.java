@@ -40,17 +40,7 @@ public class OfferItem {
 
   public Money evaluateTotalCost() {
 
-    BigDecimal discountValue = new BigDecimal(0);
-    if (discount != null) {
-      discountValue = discountValue.add(discount.getDenomination());
-    }
-
-    BigDecimal totalCost = product.getProductPrice().getDenomination()
-        .multiply(new BigDecimal(quantity))
-        .subtract(discountValue);
-    
-    return new Money(product.getProductPrice().getCurrency(),
-        product.getProductPrice().getDenomination());
+    return product.getProductPrice().multiply(quantity).subtract(discount);
   }
 
   @Override
